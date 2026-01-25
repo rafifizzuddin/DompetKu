@@ -46,6 +46,12 @@ button{border:none;border-radius:12px;padding:10px;font-weight:600;cursor:pointe
 .footer{text-align:center;margin-top:12px;font-size:12px;opacity:.6}
 .khusus{border-left:6px solid #22c55e}
 .btn-toggle.keluar.active{background:#ef4444;color:#fff}
+
+#saldoAwal,
+.mini-btn {
+  display: none;
+}
+
 </style>
 </head>
 
@@ -215,10 +221,14 @@ function resetData(){
   localStorage.removeItem('dompetku')
   riwayat.innerHTML=''
   inputCash.value=inputDigital.value=jumlah.value=ket.value=''
-  saldoAwal.style.display='block'
+  // saldoAwal.style.display='block'
   update()
   alert('✅ Data berhasil direset')
 }
+
+saldoAwal.style.display = 'none'
+document.querySelector('.mini-btn').style.display = 'none'
+
 </script>
 </body>
 </html>
