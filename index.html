@@ -51,7 +51,6 @@ button{border:none;border-radius:12px;padding:10px;font-weight:600;cursor:pointe
 .mini-btn {
   display: none;
 }
-
 </style>
 </head>
 
@@ -99,7 +98,6 @@ button{border:none;border-radius:12px;padding:10px;font-weight:600;cursor:pointe
 
   <div class="rp-input"><span>Rp</span><input inputmode="numeric" id="jumlah"></div>
 
-  <!-- ⬅ TAMBAHAN: KETERANGAN -->
   <div class="rp-input">
     <input placeholder="Keterangan (misal: jajan, gaji, transfer)" id="keterangan">
   </div>
@@ -110,6 +108,8 @@ button{border:none;border-radius:12px;padding:10px;font-weight:600;cursor:pointe
 <div class="card">
   <h2>🧾 Riwayat</h2>
   <div class="riwayat" id="riwayat"></div>
+  <!-- TOMBOL TAMBAHAN -->
+  <button class="mini-btn" id="toggleRiwayat" onclick="toggleRiwayat()">Tampilkan Semua</button>
 </div>
 
 <button class="action" style="background:#ef4444;margin-top:10px" onclick="resetData()">
@@ -122,7 +122,8 @@ button{border:none;border-radius:12px;padding:10px;font-weight:600;cursor:pointe
 <script>
 let cash=0,digital=0
 let jenis='masuk',sumber='cash'
-let riwayatData=[] // ⬅ TAMBAHAN
+let riwayatData=[]
+let tampilSemua=false   // ⬅ TAMBAHAN
 
 const f=n=>'Rp'+n.toLocaleString('id-ID')
 const p=v=>Number(v.replace(/\./g,''))||0
@@ -130,14 +131,15 @@ const p=v=>Number(v.replace(/\./g,''))||0
 const cashEl=document.getElementById('cash')
 const digitalEl=document.getElementById('digital')
 const total=document.getElementById('total')
-const riwayat=document.getElementById('riwayat') // ⬅ TAMBAHAN
-const ket=document.getElementById('keterangan') // ⬅ TAMBAHAN
+const riwayat=document.getElementById('riwayat')
+const ket=document.getElementById('keterangan')
+const btnToggleRiwayat=document.getElementById('toggleRiwayat')
 
-function saveData(){ // ⬅ TAMBAHAN
+function saveData(){
   localStorage.setItem('dompetku',JSON.stringify({cash,digital,riwayatData}))
 }
 
-function loadData(){ // ⬅ TAMBAHAN
+function loadData(){
   const d=JSON.parse(localStorage.getItem('dompetku'))
   if(!d)return
   cash=d.cash||0
@@ -146,10 +148,14 @@ function loadData(){ // ⬅ TAMBAHAN
   update()
   renderRiwayat()
 }
-loadData() // ⬅ TAMBAHAN
+loadData()
 
-function renderRiwayat(){ // ⬅ TAMBAHAN
-  riwayat.innerHTML=riwayatData.slice().reverse().map(r=>`
+function renderRiwayat(){
+  const data = tampilSemua
+    ? riwayatData
+    : riwayatData.slice(-3)
+
+  riwayat.innerHTML=data.slice().reverse().map(r=>`
     <div style="margin-bottom:6px">
       ${r.jenis==='masuk'?'⬆':'⬇'}
       ${r.sumber==='cash'?'💵':'📱'}
@@ -157,6 +163,17 @@ function renderRiwayat(){ // ⬅ TAMBAHAN
       <small style="opacity:.7">${r.ket}</small>
     </div>
   `).join('')
+
+  btnToggleRiwayat.style.display =
+    riwayatData.length>3 ? 'block':'none'
+
+  btnToggleRiwayat.textContent =
+    tampilSemua ? 'Sembunyikan':'Tampilkan Semua'
+}
+
+function toggleRiwayat(){   // ⬅ TAMBAHAN
+  tampilSemua=!tampilSemua
+  renderRiwayat()
 }
 
 function setJenis(j,b){
@@ -199,11 +216,11 @@ function tambahTransaksi(){
     jenis,
     sumber,
     jumlah:j,
-    ket: ket.value || '-' // ⬅ TAMBAHAN
+    ket: ket.value || '-'
   })
 
   jumlah.value=''
-  ket.value='' // ⬅ TAMBAHAN
+  ket.value=''
   update()
   renderRiwayat()
   saveData()
@@ -221,14 +238,13 @@ function resetData(){
   localStorage.removeItem('dompetku')
   riwayat.innerHTML=''
   inputCash.value=inputDigital.value=jumlah.value=ket.value=''
-  // saldoAwal.style.display='block'
+  tampilSemua=false
   update()
   alert('✅ Data berhasil direset')
 }
 
-saldoAwal.style.display = 'none'
-document.querySelector('.mini-btn').style.display = 'none'
-
+saldoAwal.style.display='none'
+document.querySelector('.mini-btn').style.display='none'
 </script>
 </body>
 </html>
